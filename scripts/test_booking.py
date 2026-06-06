@@ -218,10 +218,120 @@ class TestClassify(unittest.TestCase):
         # (if N_slots=0 then grid_size=0 -> fill=None)
 
     def test_result_has_required_keys(self):
-        """classify result always contains the required output-contract keys."""
+        """classify result always contains the required output-contract keys (nine after note+deposit)."""
         result = self.booking.classify("sevenrooms", [], self.CITY_CONFIG)
-        for key in ("engine", "channel", "g_i", "filled", "N_slots", "grid_size", "off_platform"):
+        for key in ("engine", "channel", "g_i", "filled", "N_slots", "grid_size",
+                    "off_platform", "note", "deposit"):
             self.assertIn(key, result, f"Missing key: {key}")
+
+    def test_note_and_deposit_types(self):
+        """note is a str and deposit is a bool on every record (uniform schema)."""
+        result = self.booking.classify("sevenrooms", [], self.CITY_CONFIG)
+        self.assertIsInstance(result["note"], str)
+        self.assertIsInstance(result["deposit"], bool)
+
+    def test_readable_deposit_true_passthrough(self):
+        """A readable venue whose probe carried a deposit signal -> record deposit==True."""
+        units = self._make_units_with_slots()
+        result = self.booking.classify("sevenrooms", units, self.CITY_CONFIG, deposit=True)
+        self.assertEqual(result["channel"], "readable")
+        self.assertTrue(result["deposit"])
+
+    def test_readable_deposit_false_default(self):
+        """A plain readable venue (no deposit signal) -> deposit==False."""
+        units = self._make_units_with_slots()
+        result = self.booking.classify("sevenrooms", units, self.CITY_CONFIG)
+        self.assertFalse(result["deposit"])
+
+    def test_note_is_representative_unit_string(self):
+        """note is the first non-empty unit note string."""
+        units = [
+            {"date": "2026-06-06", "party_size": 2, "status": "full", "slots": [], "note": ""},
+            {"date": "2026-06-07", "party_size": 2, "status": "full", "slots": [],
+             "note": "waitlist-only (3 request slots)"},
+        ]
+        result = self.booking.classify("sevenrooms", units, self.CITY_CONFIG)
+        self.assertEqual(result["note"], "waitlist-only (3 request slots)")
+
+    def test_existing_keys_unchanged_no_regression(self):
+        """The prior seven keys keep their existing types/values (no regression)."""
+        units = self._make_units_with_slots()
+        result = self.booking.classify("sevenrooms", units, self.CITY_CONFIG)
+        self.assertEqual(result["channel"], "readable")
+        self.assertEqual(result["g_i"], 0)
+        self.assertFalse(result["off_platform"])
+        self.assertIsNotNone(result["filled"])
+        self.assertIsNotNone(result["N_slots"])
+        self.assertIsInstance(result["grid_size"], int)
+
+
+# ---------------------------------------------------------------------------
+# 2b. Gate round-trip from the REAL classify/run_booking record (hardening)
+#     The booking record must carry enough metadata (engine+note+deposit) to
+#     recover the full ordinal gate 0..4 — not collapse to {0,2}.
+# ---------------------------------------------------------------------------
+
+class TestGateRoundTripFromRecord(unittest.TestCase):
+    """Feed a real classify/run_booking record back into gate_level -> full 0..4 ladder."""
+
+    CITY_CONFIG = {
+        "slug": "manila",
+        "booking_platforms": {
+            "online_engines": ["sevenrooms", "eatigo", "tablecheck", "opentable", "tock"],
+            "readable_engines": ["sevenrooms", "eatigo"],
+        },
+    }
+
+    def setUp(self):
+        self.booking = _import_booking()
+
+    def _gate_from_record(self, rec):
+        return self.booking.gate_level(rec["engine"], rec["note"], rec["deposit"])
+
+    def test_deposit_venue_round_trips_to_level_3(self):
+        """A readable sevenrooms record with deposit=True -> gate_level reads level 3.
+
+        gate_level: deposit only outranks the online-engine check when the engine
+        is NOT in the online inventory set; here we exercise a gated deposit venue
+        whose record carries deposit=True via classify pass-through.
+        """
+        rec = self.booking.classify("phone", [], self.CITY_CONFIG, deposit=True)
+        rec["slug"] = "deposit-venue"
+        level, label = self._gate_from_record(rec)
+        self.assertEqual(level, 3, f"deposit venue should be gate level 3, got {level} ({label})")
+
+    def test_lottery_tock_venue_round_trips_to_level_4(self):
+        """A run_booking record for a Tock venue -> gate_level reads level 4 from the record."""
+        venues_map = {"lottery-venue": {"engine": "tock", "identifier": "x"}}
+        records = self.booking.run_booking(venues_map, self.CITY_CONFIG, verbose=False)
+        rec = records[0]
+        self.assertIn("note", rec)
+        self.assertIn("deposit", rec)
+        level, label = self._gate_from_record(rec)
+        self.assertEqual(level, 4, f"Tock venue should be gate level 4, got {level} ({label})")
+
+    def test_online_venue_round_trips_to_level_0(self):
+        """A readable sevenrooms record (no deposit) -> gate_level reads level 0."""
+        units = [{"date": "2026-06-06", "party_size": 2, "status": "available",
+                  "slots": [{"time": "19:00", "state": "available"}], "note": ""}]
+        rec = self.booking.classify("sevenrooms", units, self.CITY_CONFIG)
+        rec["slug"] = "online-venue"
+        level, label = self._gate_from_record(rec)
+        self.assertEqual(level, 0, f"online sevenrooms venue should be gate level 0, got {level}")
+
+    def test_run_booking_records_all_carry_note_deposit(self):
+        """Every run_booking record (incl. the no-engine off-platform branch) has note+deposit."""
+        venues_map = {
+            "with-engine": {"engine": "sevenrooms", "identifier": "x"},
+            "no-engine": {},
+        }
+        records = self.booking.run_booking(venues_map, self.CITY_CONFIG, verbose=False)
+        self.assertEqual(len(records), 2)
+        for rec in records:
+            self.assertIn("note", rec)
+            self.assertIn("deposit", rec)
+            self.assertIsInstance(rec["note"], str)
+            self.assertIsInstance(rec["deposit"], bool)
 
 
 # ---------------------------------------------------------------------------
