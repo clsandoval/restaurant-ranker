@@ -113,8 +113,13 @@ The agent assembles the corpus itself:
 3. Dedup and score:
    ```python
    from corpus import dedup, bucket_cuisine, normalize_name, _venue_slug
-   deduped = dedup(rows)   # adds slug, prestige_score, sources_n
+   deduped = dedup(rows)   # adds prestige_score, sources_n (NOT slug, NOT cuisine — add those explicitly after)
+   for v in deduped:
+       v["slug"] = _venue_slug(v["venue"])
+       v["cuisine"] = bucket_cuisine(v.get("cuisine_raw"), cfg["cuisine_taxonomy"])
    ```
+
+   **Why this loop is required:** `dedup()` returns records without `slug` or `cuisine`. `model.prepare_model_data` filters `[r for r in corpus if r.get("slug")]`, so any corpus record missing `slug` is silently discarded — meaning zero venues would be modeled without this loop. The `cfg` variable is already bound above by `cfg = load_city("<city>")`.
 
 4. Write `deduped` to `<slug>-corpus.json` in the caller's CWD.
 
