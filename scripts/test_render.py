@@ -45,6 +45,9 @@ def _import_render():
     """Lazy importlib load so a missing module shows a clear error."""
     spec = importlib.util.spec_from_file_location("render", _SCRIPTS_DIR / "render.py")
     mod = importlib.util.module_from_spec(spec)
+    # Register in sys.modules BEFORE exec so @dataclass can resolve cls.__module__
+    # (the dataclass machinery looks the module up in sys.modules by name).
+    sys.modules["render"] = mod
     spec.loader.exec_module(mod)
     return mod
 
