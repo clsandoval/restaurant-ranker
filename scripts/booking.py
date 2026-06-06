@@ -18,7 +18,9 @@ Exports
   probe_venue(engine, identifier) -> units dict
   fill_from_units(units) -> (filled:int|None, N_slots:int|None, grid_size:int)
   gate_level(engine, note, deposit) -> (level:int 0..4, label:str)
-  classify(engine, units, city_config) -> per-venue booking record dict
+  classify(engine, units, city_config, *, deposit=False) -> per-venue booking record dict
+    (record carries note+deposit as additive read-only metadata so the ordinal
+     gate 0..4 survives end-to-end — BOOK-04 read-only invariant preserved)
   PROBERS  -- dict mapping engine name -> callable(identifier) -> units dict
 
 CLI
@@ -480,8 +482,27 @@ def gate_level(engine: str, note: str, deposit: bool) -> tuple[int, str]:
 # classify — channel assignment + off-platform honesty (BOOK-03)
 # ---------------------------------------------------------------------------
 
-def classify(engine: str, units: list[dict], city_config: dict) -> dict:
-    """Assign channel, g_i, fill, and off_platform flag for a venue.
+def _representative_note(units: list[dict]) -> str:
+    """Pick a representative booking-friction note from the probed units.
+
+    Returns the first non-empty unit ``note`` string, or "" when none.
+    Read-only: this only reads metadata already produced by the probers.
+    """
+    for u in units or []:
+        n = (u.get("note") or "").strip()
+        if n:
+            return n
+    return ""
+
+
+def classify(
+    engine: str,
+    units: list[dict],
+    city_config: dict,
+    *,
+    deposit: bool = False,
+) -> dict:
+    """Assign channel, g_i, fill, off_platform, note, and deposit for a venue.
 
     Uses city_config['booking_platforms']['readable_engines'] and
     'online_engines' to determine channel:
@@ -494,6 +515,13 @@ def classify(engine: str, units: list[dict], city_config: dict) -> dict:
     HONESTY RAIL: blocked-here and gated venues NEVER get a fabricated fill.
     fill=None is the signal: "we have no direct demand observation for this venue." (BOOK-03)
 
+    note+deposit are ADDITIVE metadata pass-through (no new I/O, no booking-write —
+    BOOK-04 read-only invariant preserved). ``note`` is a representative free-text
+    booking-friction string from the probed units; ``deposit`` is the deposit-required
+    flag threaded from the caller (read from the probe result's ``deposit.required``).
+    Together with ``engine`` they let ``gate_level(engine, note, deposit)`` recover the
+    full ordinal ladder 0..4 downstream instead of collapsing to {0, 2}.
+
     Parameters
     ----------
     engine : str
@@ -502,12 +530,15 @@ def classify(engine: str, units: list[dict], city_config: dict) -> dict:
         Units list from probe_venue (may be empty for gated/blocked venues).
     city_config : dict
         Full city config from load_city() — must contain 'booking_platforms'.
+    deposit : bool, keyword-only
+        Deposit-required flag (default False), threaded from the probe result's
+        ``deposit.required``. Metadata only — never triggers a booking-write.
 
     Returns
     -------
     dict
         Per-venue booking record:
-        { engine, channel, g_i, filled, N_slots, grid_size, off_platform }
+        { engine, channel, g_i, filled, N_slots, grid_size, off_platform, note, deposit }
     """
     bp = city_config.get("booking_platforms", {})
     online_engines = set(bp.get("online_engines", []))
@@ -516,6 +547,9 @@ def classify(engine: str, units: list[dict], city_config: dict) -> dict:
     e = (engine or "").lower()
     is_online = e in online_engines
     is_readable = e in readable_engines
+
+    note = _representative_note(units)
+    deposit = bool(deposit)
 
     if is_readable:
         # Attempt fill computation
@@ -532,6 +566,8 @@ def classify(engine: str, units: list[dict], city_config: dict) -> dict:
             "N_slots": N_slots,
             "grid_size": grid_size,
             "off_platform": False,
+            "note": note,
+            "deposit": deposit,
         }
     elif is_online:
         # Online engine but not readable (anti-bot or unsupported) — fill MISSING (BOOK-03)
@@ -543,6 +579,8 @@ def classify(engine: str, units: list[dict], city_config: dict) -> dict:
             "N_slots": None,
             "grid_size": 0,
             "off_platform": False,
+            "note": note,
+            "deposit": deposit,
         }
     else:
         # Not in any online set — phone / walk-in / lottery — off-platform (BOOK-03)
@@ -554,6 +592,8 @@ def classify(engine: str, units: list[dict], city_config: dict) -> dict:
             "N_slots": None,
             "grid_size": 0,
             "off_platform": True,
+            "note": note,
+            "deposit": deposit,
         }
 
 
@@ -625,7 +665,7 @@ def run_booking(
     -------
     list[dict]
         Per-venue booking records with slug, engine, channel, g_i, filled,
-        N_slots, grid_size, off_platform.
+        N_slots, grid_size, off_platform, note, deposit.
     """
     records: list[dict] = []
     readable_evidence: list[dict] = []
@@ -636,7 +676,8 @@ def run_booking(
         identifier = info.get("identifier", "")
 
         if not engine:
-            # No engine info -> treat as off-platform
+            # No engine info -> treat as off-platform.
+            # note=""/deposit=False keep the schema uniform across all records.
             rec = {
                 "slug": slug,
                 "engine": "",
@@ -646,6 +687,8 @@ def run_booking(
                 "N_slots": None,
                 "grid_size": 0,
                 "off_platform": True,
+                "note": "",
+                "deposit": False,
             }
             records.append(rec)
             off_platform_count += 1
@@ -653,8 +696,10 @@ def run_booking(
 
         units_result = probe_venue(engine, identifier)
         units = units_result.get("units", [])
+        # Read-only metadata pass-through: deposit flag from the probe result.
+        deposit_flag = bool(units_result.get("deposit", {}).get("required", False))
 
-        channel_rec = classify(engine, units, city_config)
+        channel_rec = classify(engine, units, city_config, deposit=deposit_flag)
         channel_rec["slug"] = slug
 
         # Count dated units returned and total offered slots (fill evidence)
