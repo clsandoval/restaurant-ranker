@@ -1,6 +1,6 @@
 ---
 name: booking-probe
-description: Use when probing restaurant booking platforms (TableCheck, SevenRooms, Chope, CoverManager, Hungry Hub, Eatigo, Weeloy, Inline, OpenTable, Resy, Tock) to read table availability for a trip — which dates / times / party sizes are open vs booked out — across a city's restaurants. Read-only: reads the calendar, never makes or confirms a reservation. Drives the real booking widget via the agent-browser CLI, one verified recipe per platform, one browser session per restaurant for sequential/parallel fan-out. Part of the lakbai plugin.
+description: Use when probing restaurant booking platforms (TableCheck, SevenRooms, Chope, CoverManager, Hungry Hub, Eatigo, Weeloy, Inline, OpenTable, Resy, Tock) to read table availability for a trip — which dates / times / party sizes are open vs booked out — across a city's restaurants. Read-only: reads the calendar, never makes or confirms a reservation. Drives the real booking widget via the agent-browser CLI, one verified recipe per platform, one browser session per restaurant for sequential/parallel fan-out. Part of the restaurant-ranker plugin.
 ---
 
 # Booking Probe
