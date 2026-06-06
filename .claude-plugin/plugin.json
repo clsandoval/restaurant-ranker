@@ -1,0 +1,7 @@
+{
+  "name": "restaurant-ranker",
+  "description": "Restaurant ranker — fuses editorial prestige, Google reviews, and live booking-demand into one Bayesian ranking with honest uncertainty. Read-only, never books.",
+  "version": "0.1.0",
+  "author": { "name": "clsandoval" },
+  "license": "MIT"
+}

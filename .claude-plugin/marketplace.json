@@ -1,0 +1,19 @@
+{
+  "name": "restaurant-ranker-local",
+  "owner": {
+    "name": "clsandoval"
+  },
+  "metadata": {
+    "description": "Local dev marketplace for the restaurant-ranker plugin",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "restaurant-ranker",
+      "source": "./",
+      "description": "Restaurant ranker — fuses editorial prestige, Google reviews, and live booking-demand into one Bayesian ranking with honest uncertainty. Read-only, never books.",
+      "version": "0.1.0",
+      "strict": false
+    }
+  ]
+}
