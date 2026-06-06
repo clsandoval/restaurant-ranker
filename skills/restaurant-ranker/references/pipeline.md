@@ -57,15 +57,23 @@ row = {
 ```
 
 **Agent procedure:**
-1. For each `prestige_sources[].name` in `cities/<slug>.json`, run `web_search` to gather venues.
-2. Build one row per venue using the shape above.
-3. Import and call from `scripts/corpus.py`:
+1. Load the city config so the cuisine taxonomy is available:
    ```python
    import sys; sys.path.insert(0, "scripts")
-   from corpus import dedup, bucket_cuisine, normalize_name, _venue_slug
-   deduped = dedup(rows)   # adds slug, prestige_score, sources_n
+   from cityconfig import load_city
+   cfg = load_city("<city>")
    ```
-4. Write `deduped` (the list returned by `dedup`) to `<slug>-corpus.json`.
+2. For each `prestige_sources[].name` in `cities/<slug>.json`, run `web_search` to gather venues.
+3. Build one row per venue using the shape above (note: `cuisine_raw`, not `cuisine`).
+4. Import and call from `scripts/corpus.py`:
+   ```python
+   from corpus import dedup, bucket_cuisine, normalize_name, _venue_slug
+   deduped = dedup(rows)   # adds prestige_score, sources_n (NOT slug, NOT cuisine — add those explicitly after)
+   for v in deduped:
+       v["slug"] = _venue_slug(v["venue"])
+       v["cuisine"] = bucket_cuisine(v.get("cuisine_raw"), cfg["cuisine_taxonomy"])
+   ```
+5. Write `deduped` (the list returned by `dedup`, now with `slug` and `cuisine` on every record) to `<slug>-corpus.json`.
 
 **`gather_source()` is left AS-IS and must NOT be implemented.** This is a locked design decision
 (A3): the agent fills the seam via `web_search`; the stdlib-safe `gather_source` stub is
