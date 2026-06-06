@@ -1,0 +1,65 @@
+{
+  "city": "Manila",
+  "slug": "manila",
+  "country": "Philippines",
+  "prestige_sources": [
+    {"name": "Asia's 50 Best Restaurants"},
+    {"name": "Michelin Guide Philippines"},
+    {"name": "Tatler Asia Best Restaurants"},
+    {"name": "Spot.ph Best Restaurants Manila"},
+    {"name": "Booky Prime Manila"},
+    {"name": "CNT Philippines Restaurants"}
+  ],
+  "cuisine_taxonomy": [
+    {
+      "bucket": "Japanese",
+      "tokens": ["japanese", "sushi", "omakase", "kaiseki", "kappo"]
+    },
+    {
+      "bucket": "Italian",
+      "tokens": ["italian"]
+    },
+    {
+      "bucket": "French",
+      "tokens": ["french"]
+    },
+    {
+      "bucket": "Spanish",
+      "tokens": ["spanish", "basque", "mediterranean"]
+    },
+    {
+      "bucket": "Steakhouse",
+      "tokens": ["steak"]
+    },
+    {
+      "bucket": "Chinese",
+      "tokens": ["chinese", "cantonese", "dimsum"]
+    },
+    {
+      "bucket": "Filipino",
+      "tokens": ["filipino"]
+    },
+    {
+      "_note": "fallthrough bucket — any cuisine_raw not matched by the 7 buckets above is classified here",
+      "bucket": "Modern/Contemporary",
+      "tokens": []
+    }
+  ],
+  "booking_platforms": {
+    "online_engines": [
+      "sevenrooms",
+      "eatigo",
+      "tablecheck",
+      "opentable",
+      "tock",
+      "autoreserve",
+      "dishcult",
+      "oddle",
+      "covermanager"
+    ],
+    "readable_engines": [
+      "sevenrooms",
+      "eatigo"
+    ]
+  }
+}
