@@ -415,7 +415,8 @@ def fit(model, *, seed: int = 42, draws: int = 1500, tune: int = 3000,
 def summarize_posterior(idata, venue_meta: list[dict]) -> RankingResult:
     """InferenceData -> RankingResult (ranked records + diagnostics). PURE.
 
-    Uses az.hdi(..., prob=0.94) — arviz 1.x API (NOT hdi_prob=, Pitfall 1).
+    Uses az.hdi(..., prob=0.94) — the arviz 1.x kwarg (the old pre-1.x spelling
+    was renamed; Pitfall 1).
     Each record's readable/fill/Nslots/engine/off_platform come straight from
     venue_meta — never fabricated (MODEL-04 honesty).
     """
@@ -440,7 +441,7 @@ def summarize_posterior(idata, venue_meta: list[dict]) -> RankingResult:
             ess_min = float(summ["ess_bulk"].min())
 
     q_mean = post["q"].mean(("chain", "draw")).values
-    hdi = az.hdi(idata, var_names=["q"], prob=0.94)["q"].values  # 1.x: prob=, not hdi_prob=
+    hdi = az.hdi(idata, var_names=["q"], prob=0.94)["q"].values  # 1.x kwarg is prob=
 
     # beta_b / beta_p summaries.
     def _beta_summary(name: str, want_p: bool) -> dict | None:
