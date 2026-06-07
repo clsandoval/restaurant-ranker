@@ -1,0 +1,66 @@
+{
+  "city": "Lisbon",
+  "slug": "lisbon",
+  "country": "Portugal",
+  "prestige_sources": [
+    {"name": "MICHELIN Guide Portugal"},
+    {"name": "The World's 50 Best Restaurants"},
+    {"name": "Time Out Lisboa Best Restaurants"},
+    {"name": "Tatler Best Restaurants Lisbon"},
+    {"name": "Lisbon Eater / Eater Lisbon"},
+    {"name": "Condé Nast Traveller Lisbon Restaurants"}
+  ],
+  "cuisine_taxonomy": [
+    {
+      "bucket": "Portuguese",
+      "tokens": ["portuguese", "tasca", "petiscos", "bacalhau", "marisqueira", "cervejaria"]
+    },
+    {
+      "bucket": "Seafood",
+      "tokens": ["seafood", "fish", "mariscos", "marisco"]
+    },
+    {
+      "bucket": "Japanese",
+      "tokens": ["japanese", "sushi", "omakase", "nikkei"]
+    },
+    {
+      "bucket": "Italian",
+      "tokens": ["italian", "pizza", "pasta"]
+    },
+    {
+      "bucket": "French",
+      "tokens": ["french"]
+    },
+    {
+      "bucket": "Spanish",
+      "tokens": ["spanish", "basque", "iberian", "mediterranean"]
+    },
+    {
+      "bucket": "Steakhouse",
+      "tokens": ["steak", "churrasco", "grill"]
+    },
+    {
+      "_note": "fallthrough bucket — any cuisine_raw not matched by the 7 buckets above is classified here",
+      "bucket": "Modern/Contemporary",
+      "tokens": []
+    }
+  ],
+  "booking_platforms": {
+    "online_engines": [
+      "sevenrooms",
+      "eatigo",
+      "tablecheck",
+      "opentable",
+      "tock",
+      "autoreserve",
+      "dishcult",
+      "oddle",
+      "covermanager",
+      "thefork"
+    ],
+    "readable_engines": [
+      "sevenrooms",
+      "covermanager"
+    ]
+  }
+}
