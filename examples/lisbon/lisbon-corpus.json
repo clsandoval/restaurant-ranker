@@ -1,0 +1,248 @@
+[
+  {
+    "venue": "Belcanto",
+    "area": "Chiado",
+    "cuisine_raw": "Portuguese contemporary fine dining",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "MICHELIN Guide Portugal",
+      "Tatler Best Restaurants Lisbon",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 4,
+    "sources_n": 4,
+    "slug": "belcanto",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Alma",
+    "area": "Chiado",
+    "cuisine_raw": "Portuguese-Asian fine dining",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "MICHELIN Guide Portugal",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 3,
+    "sources_n": 3,
+    "slug": "alma",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Feitoria",
+    "area": "Belém",
+    "cuisine_raw": "modern Portuguese",
+    "prestige_sources": [
+      "MICHELIN Guide Portugal"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "feitoria",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Arkhe",
+    "area": "Chiado",
+    "cuisine_raw": "vegetarian fine dining",
+    "prestige_sources": [
+      "MICHELIN Guide Portugal",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "arkhe",
+    "cuisine": "Modern/Contemporary"
+  },
+  {
+    "venue": "Marlene",
+    "area": "Avenidas Novas",
+    "cuisine_raw": "modern Portuguese",
+    "prestige_sources": [
+      "MICHELIN Guide Portugal",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "marlene",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Epur",
+    "area": "Chiado",
+    "cuisine_raw": "French contemporary",
+    "prestige_sources": [
+      "MICHELIN Guide Portugal",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "epur",
+    "cuisine": "French"
+  },
+  {
+    "venue": "Encanto",
+    "area": "Chiado",
+    "cuisine_raw": "vegetarian fine dining",
+    "prestige_sources": [
+      "MICHELIN Guide Portugal",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "encanto",
+    "cuisine": "Modern/Contemporary"
+  },
+  {
+    "venue": "SÁLA",
+    "area": "Baixa",
+    "cuisine_raw": "modern Portuguese",
+    "prestige_sources": [
+      "MICHELIN Guide Portugal"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "sala",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Tapisco",
+    "area": "Príncipe Real",
+    "cuisine_raw": "Spanish Portuguese petiscos",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "tapisco",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Gunpowder Lisbon",
+    "area": "Bairro Alto",
+    "cuisine_raw": "Indian",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "gunpowder-lisbon",
+    "cuisine": "Modern/Contemporary"
+  },
+  {
+    "venue": "Pizzaria Lisboa",
+    "area": "Trindade",
+    "cuisine_raw": "Italian pizza",
+    "prestige_sources": [
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "pizzaria-lisboa",
+    "cuisine": "Italian"
+  },
+  {
+    "venue": "Rocco",
+    "area": "Chiado",
+    "cuisine_raw": "Italian",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "rocco",
+    "cuisine": "Italian"
+  },
+  {
+    "venue": "BAHR",
+    "area": "Bairro Alto",
+    "cuisine_raw": "Portuguese",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "bahr",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Sala de Corte",
+    "area": "Cais do Sodré",
+    "cuisine_raw": "steakhouse",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "sala-de-corte",
+    "cuisine": "Steakhouse"
+  },
+  {
+    "venue": "Boa-Bao",
+    "area": "Chiado",
+    "cuisine_raw": "pan-Asian",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "Lisbon Eater / Eater Lisbon",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 3,
+    "sources_n": 3,
+    "slug": "boa-bao",
+    "cuisine": "Modern/Contemporary"
+  },
+  {
+    "venue": "Cervejaria Ramiro",
+    "area": "Intendente",
+    "cuisine_raw": "seafood marisqueira",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "Lisbon Eater / Eater Lisbon",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 3,
+    "sources_n": 3,
+    "slug": "cervejaria-ramiro",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Taberna da Rua das Flores",
+    "area": "Chiado",
+    "cuisine_raw": "Portuguese petiscos tasca",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "Lisbon Eater / Eater Lisbon"
+    ],
+    "prestige_score": 2,
+    "sources_n": 2,
+    "slug": "taberna-da-rua-das-flores",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "O Velho Eurico",
+    "area": "São Cristóvão",
+    "cuisine_raw": "Portuguese tasca",
+    "prestige_sources": [
+      "Lisbon Eater / Eater Lisbon"
+    ],
+    "prestige_score": 1,
+    "sources_n": 1,
+    "slug": "o-velho-eurico",
+    "cuisine": "Portuguese"
+  },
+  {
+    "venue": "Prado",
+    "area": "Baixa",
+    "cuisine_raw": "modern farm-to-table Portuguese",
+    "prestige_sources": [
+      "Condé Nast Traveller Lisbon Restaurants",
+      "Lisbon Eater / Eater Lisbon",
+      "Time Out Lisboa Best Restaurants"
+    ],
+    "prestige_score": 3,
+    "sources_n": 3,
+    "slug": "prado",
+    "cuisine": "Portuguese"
+  }
+]
