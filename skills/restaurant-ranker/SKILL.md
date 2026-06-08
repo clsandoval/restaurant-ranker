@@ -189,16 +189,57 @@ over plain HTTP. Prints `=== FILL EVIDENCE ===` and `Off-platform / no-signal ve
 Anti-bot engines come back `channel="blocked-here"`, `fill=None` — an **honest gap, not a
 verdict.** Do NOT stop here.
 
-**Tier C'-2 — CloakBrowser escalation of every `blocked-here` venue (the showcase):**
+**Tier C'-2 — CloakBrowser escalation of every `blocked-here` venue:**
 
-For each `blocked-here` venue, drive its real booking widget with the `booking-probe` sibling
-skill — CloakBrowser (`patchright + xvfb + humanize`) clears Turnstile / DataDome / ALTCHA / CDP
-walls and reads the live slot grid. Verified recipes per engine live in
-`../booking-probe/recipes/<engine>.md`; the tiered CloakBrowser playbook (which tier each wall
-needs, and the rule that a **403 from vanilla CloakBrowser means wrong tier, not "blocked"**) is
-the `../cloakbrowser/SKILL.md` skill. **THE READ-ONLY LAW governs every click** — reach and read
-the slot list, then STOP. Do not rationalize a coverage gap as "architectural" before confirming
-you ran the correct escalation tier (headed-under-xvfb + patchright for CDP/Cloudflare walls).
+> **BEFORE WRITING ANY CODE: READ `../cloakbrowser/SKILL.md` end-to-end.**
+> The launch API is non-obvious — guessing it (e.g. trying `create_browser` or `launch_async`)
+> produces wrong-tier runs that 403, which looks like failure but is just the wrong config.
+> Reading the skill takes two minutes and prevents the single most common failure in this step.
+
+For each `blocked-here` venue, drive its real booking widget via CloakBrowser (`patchright +
+xvfb + humanize`) which clears Turnstile / DataDome / ALTCHA / CDP walls and reads the live
+slot grid. Verified recipes per engine live in `../booking-probe/recipes/<engine>.md`.
+
+**Install (add to the ranker venv, once):**
+
+```bash
+uv pip install --python /tmp/ranker-venv/bin/python cloakbrowser patchright
+/tmp/ranker-venv/bin/cloakbrowser install   # stealth Chromium (~206 MB)
+/tmp/ranker-venv/bin/patchright install chromium
+command -v xvfb-run || (apt-get update -q && apt-get install -y xvfb)
+```
+
+**Launch recipe (tiers 3–5 — TableCheck, OpenTable, DinnerBooking, Cloudflare walls):**
+
+```bash
+# Wrap your script with xvfb-run — headed mode requires a virtual display
+timeout 240 xvfb-run -a -s "-screen 0 1920x1080x24" /tmp/ranker-venv/bin/python flow.py
+```
+
+```python
+from cloakbrowser import launch_context   # NOT launch_async, NOT create_browser
+
+ctx = launch_context(
+    headless=False,                       # CRITICAL: headed under xvfb — headless is detectable
+    humanize=True,                        # Bézier mouse + human timing
+    human_preset="careful",              # extended delays for strict anti-bot
+    backend="patchright",                # CDP-signal suppression — required for tiers 3–4
+    ignore_https_errors=True,            # container TLS-MITM
+    args=["--ignore-certificate-errors"],
+)
+page = ctx.new_page()
+```
+
+**A 403 is NOT a verdict — it means wrong tier.** A 403 from headless or no-patchright
+CloakBrowser against TableCheck/Cloudflare walls is a wrong-tier result, not evidence the
+venue is unautomatable. Verified example: TableCheck (Sorn, Nusara, Gaa) returns 403 to
+headless/plain stealth but is fully readable with `backend="patchright"` + `headless=False`
+under xvfb. The full tier ladder and which tier each wall demands is in
+`../cloakbrowser/SKILL.md`. Do NOT declare a venue `unresolved` after a wrong-tier 403.
+
+**THE READ-ONLY LAW governs every click** — reach and read the slot list, then STOP. Do not
+rationalize a coverage gap as "architectural" before confirming you ran the correct escalation
+tier.
 
 booking-probe writes one resolved venue JSON per restaurant under
 `./<city>-booking-probe/clickthrough/<slug>.json`. A venue it cannot read stays honestly
@@ -308,4 +349,5 @@ Signals come from each step's existing stdout:
 ## Related
 
 - `skills/booking-probe/` — engine discovery recipes + THE READ-ONLY LAW origin; delegate hard engines here.
+- `skills/cloakbrowser/SKILL.md` — full tier ladder, launch recipe detail, per-engine verified coverage table.
 - `references/pipeline.md` — exact invocation chain, both seam contracts, venv setup detail.
