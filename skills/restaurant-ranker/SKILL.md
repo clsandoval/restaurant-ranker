@@ -189,20 +189,42 @@ over plain HTTP. Prints `=== FILL EVIDENCE ===` and `Off-platform / no-signal ve
 Anti-bot engines come back `channel="blocked-here"`, `fill=None` — an **honest gap, not a
 verdict.** Do NOT stop here.
 
-**Tier C'-2 — CloakBrowser escalation of every `blocked-here` venue (the showcase):**
+**Tier C'-2 — escalate EVERY `blocked-here` venue. This is not optional.**
 
-For each `blocked-here` venue, drive its real booking widget with the `booking-probe` sibling
-skill — CloakBrowser (`patchright + xvfb + humanize`) clears Turnstile / DataDome / ALTCHA / CDP
-walls and reads the live slot grid. Verified recipes per engine live in
-`../booking-probe/recipes/<engine>.md`; the tiered CloakBrowser playbook (which tier each wall
-needs, and the rule that a **403 from vanilla CloakBrowser means wrong tier, not "blocked"**) is
-the `../cloakbrowser/SKILL.md` skill. **THE READ-ONLY LAW governs every click** — reach and read
-the slot list, then STOP. Do not rationalize a coverage gap as "architectural" before confirming
-you ran the correct escalation tier (headed-under-xvfb + patchright for CDP/Cloudflare walls).
+> 🚫 **There is no "demo" or "full-run" exception.** A run that stops at `blocked-here` and only
+> *describes* what escalation "would" do is an **incomplete run that you must not present as a
+> result** — it silently drops the booking pillar. Never write "in a full/production run I would
+> escalate", "would normally escalate via CloakBrowser", or "(skipped for this demo)". If you
+> catch yourself narrating escalation in the conditional tense, STOP and actually do it now.
+> You are already in the full run. There is no other run.
 
-booking-probe writes one resolved venue JSON per restaurant under
-`./<city>-booking-probe/clickthrough/<slug>.json`. A venue it cannot read stays honestly
-`unresolved` (e.g. PerimeterX / residential-IP walls) — never faked.
+Work each `blocked-here` venue, **cheapest rung first** — most cost you nothing:
+
+- **C'-2a — just fetch the page (no browser, do this first).** `web_fetch` (or `curl`) the
+  venue's booking URL. **Many Tock / Resy / TableCheck / Zenchef pages render the slot times
+  directly in the HTML/JSON.** If you see times, *that is a live fill observation* — you are
+  done with this venue; capture it (below). Do NOT escalate further and do NOT defer it.
+  (Real failure mode this prevents: fetching a Tock page, seeing "6:00 PM, 6:15 PM…", and then
+  throwing it away while saying you "would" escalate. The times you just read ARE the data.)
+- **C'-2b — CloakBrowser, only if C'-2a returned no times.** Drive the real widget with the
+  `booking-probe` sibling skill — CloakBrowser (`patchright + xvfb + humanize`) clears
+  Turnstile / DataDome / ALTCHA / CDP walls. Verified recipes per engine:
+  `../booking-probe/recipes/<engine>.md`; the tiered playbook (which tier each wall needs, and
+  the rule that a **403 from vanilla CloakBrowser means wrong tier, not "blocked"**) is the
+  `../cloakbrowser/SKILL.md` skill — **read it before deciding a venue is unreadable.**
+- **C'-2c — only now may a venue be `unresolved`.** A venue is honestly unreadable ONLY after
+  C'-2a returned no times AND the correct CloakBrowser tier was actually attempted and blocked
+  (e.g. PerimeterX / residential-IP walls). "I didn't try" is never a reason to mark unresolved.
+
+**THE READ-ONLY LAW governs every fetch/click** — reach and read the slot list, then STOP.
+Do not rationalize a coverage gap as "architectural" before confirming you ran C'-2a and the
+correct CloakBrowser tier.
+
+**Capturing a read (C'-2a or C'-2b):** write one resolved venue JSON per restaurant to
+`./<city>-booking-probe/clickthrough/<slug>.json` with the units shape
+`{slug, platform, units:[{date, party_size, status, slots:[{time, state}], note}]}` (booking-probe
+writes this for you; for a C'-2a hand-fetch, write it yourself from the times you read). A venue
+you genuinely cannot read stays `unresolved` — never faked.
 
 **Merge the live reads back into the booking channel:**
 
