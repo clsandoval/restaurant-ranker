@@ -15,7 +15,7 @@ SMOKE.md with `lisbon` and apply the Lisbon-specific divergences documented here
 
 **User (live run — human-action checkpoint, plan 04-02):**
 - The user holds `GOOGLE_MAPS_API_KEY` and the anti-bot-capable local network environment.
-- The user drives Steps A–E below inside a Claude Code session from the plugin root.
+- The user drives Steps A–E below inside a Claude Code session from this skill's own directory.
 - After the run completes, the agent commits the output bundle to `examples/lisbon/`.
 
 The live run is the Phase-4 proof (D-04). Do not attempt it without `GOOGLE_MAPS_API_KEY` set —
@@ -79,25 +79,25 @@ export GOOGLE_MAPS_API_KEY=<your-key>
 The coverage report MUST show `reviews: ran — ok`, NOT `skipped`. If you see `skipped`, the key
 was not exported.
 
-### 4 — Working directory: plugin root
+### 4 — Working directory: this skill's own directory
 
-All commands below run from the **plugin root** (the directory containing `scripts/` and `cities/`).
+All commands below run from **this skill's own directory** (the directory containing `scripts/` and `cities/`).
 Outputs land in the **caller's CWD** with `lisbon-` prefix.
 
 ```bash
-cd path/to/restaurant-ranker   # the dir with scripts/, cities/, skills/
+cd path/to/skills/restaurant-ranker   # the dir with scripts/, cities/
 ```
 
 ---
 
 ## Step-by-step run
 
-Run all commands from the plugin root. Steps B, C', D, and E are shell commands. Steps A and C
+Run all commands from this skill's own directory. Steps B, C', D, and E are shell commands. Steps A and C
 require the agent to fill in the seams (web_search + engine discovery).
 
 ### Step A — Corpus (Seam 1: agent gathers venues via web_search)
 
-Open a Claude Code session in the plugin root and invoke:
+Open a Claude Code session in this skill's own directory and invoke:
 
 ```
 rank the best restaurants in lisbon
@@ -204,7 +204,7 @@ Writes `lisbon-board.md`. The board contains:
 ## File-existence asserts
 
 After the full run, confirm all artifacts exist and the board has the expected shape.
-Copy-paste this bash one-liner from the plugin root:
+Copy-paste this bash one-liner from this skill's own directory:
 
 ```bash
 for f in lisbon-corpus.json lisbon-reviews.json lisbon-venues.json lisbon-booking.json lisbon-results.json lisbon-board.md; do

@@ -77,7 +77,7 @@ export MAPBOX_TOKEN=<your-token>        # Mapbox alternative for routing
 
 ### Shipped city (manila)
 
-Manila ships out of the box. Open a Claude Code session in the plugin root and type:
+Manila ships out of the box. Open a Claude Code session and type:
 
 ```
 rank the best restaurants in manila
@@ -89,8 +89,9 @@ step-by-step smoke check and expected artifacts.
 
 ### Cold city (new city you configure)
 
-To rank a city not yet in `cities/`, author `cities/<slug>.json` following
-`cities/_SCHEMA.md` (CONFIG-02 — no code change needed, only the JSON config). Then invoke:
+To rank a city not yet in `skills/restaurant-ranker/cities/`, author
+`skills/restaurant-ranker/cities/<slug>.json` following
+`skills/restaurant-ranker/cities/_SCHEMA.md` (CONFIG-02 — no code change needed, only the JSON config). Then invoke:
 
 ```
 rank the best restaurants in <city>
@@ -118,11 +119,12 @@ design.
 
 ## Status
 
-- **Phase 1 — Data pipeline:** DONE. `scripts/corpus.py`, `scripts/reviews.py`,
-  `scripts/booking.py`, `scripts/cityconfig.py`, plus `cities/*.json` configs and the
-  `skills/booking-probe/` recipes.
-- **Phase 2 — Bayesian model + ranked report:** DONE. `scripts/model.py` (PyMC 4-channel
-  Bayesian fit; 94% HDI intervals), `scripts/render.py` (4-section board), 188 automated
-  tests.
+- **Phase 1 — Data pipeline:** DONE. `skills/restaurant-ranker/scripts/corpus.py`,
+  `skills/restaurant-ranker/scripts/reviews.py`, `skills/restaurant-ranker/scripts/booking.py`,
+  `skills/restaurant-ranker/scripts/cityconfig.py`, plus `skills/restaurant-ranker/cities/*.json`
+  configs and the `skills/booking-probe/` recipes.
+- **Phase 2 — Bayesian model + ranked report:** DONE. `skills/restaurant-ranker/scripts/model.py`
+  (PyMC 4-channel Bayesian fit; 94% HDI intervals),
+  `skills/restaurant-ranker/scripts/render.py` (4-section board), 188 automated tests.
 - **Phase 3 — Single orchestrator skill:** DONE. `skills/restaurant-ranker/` — one prompt
   drives the full 5-step chain via `SKILL.md` + `references/pipeline.md`.

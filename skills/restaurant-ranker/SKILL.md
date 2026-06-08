@@ -83,7 +83,7 @@ ranking still runs on prestige + booking-demand alone.
 ## THE WORKFLOW
 
 Each step is a single action; do not batch. Observe the outcome of each step before proceeding.
-Run all commands from the **plugin root** (the directory containing `scripts/` and `cities/`).
+Run all commands from **this skill's own directory** (the directory containing `scripts/` and `cities/`).
 
 ### Step A — Corpus (Seam 1: agent gathers venues via web_search)
 

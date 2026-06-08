@@ -1,8 +1,8 @@
 # Pipeline Reference — restaurant-ranker
 
 Mechanical detail for the `restaurant-ranker` orchestrator. The SKILL.md links here for the exact
-invocation chain, data contracts, and venv setup. All commands run from the **plugin root** (the
-directory containing `scripts/` and `cities/`). All outputs land in the **caller's CWD** with
+invocation chain, data contracts, and venv setup. All commands run from **this skill's own
+directory** (the directory containing `scripts/` and `cities/`). All outputs land in the **caller's CWD** with
 `<slug>-` prefixes — every script defaults `--out` to `os.getcwd()/<slug>-<artifact>`.
 
 ---

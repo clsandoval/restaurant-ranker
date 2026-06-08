@@ -44,18 +44,18 @@ live cold-city run on a non-manila city is Phase 4's job; do NOT require it here
    export GOOGLE_MAPS_API_KEY=<your-key>
    ```
 
-4. Working directory: **plugin root** (the directory containing `scripts/` and `cities/`).
+4. Working directory: **this skill's own directory** (the directory containing `scripts/` and `cities/`).
 
 ---
 
 ## Step-by-step run
 
-Run all commands from the plugin root. Steps B, C', D, and E are shell commands; Steps A and
+Run all commands from this skill's own directory. Steps B, C', D, and E are shell commands; Steps A and
 C require the agent to fill in the seams (web_search + engine discovery).
 
 ### Step A — Corpus (Seam 1: agent gathers venues via web_search)
 
-Open a Claude Code session in the plugin root and invoke:
+Open a Claude Code session in this skill's own directory and invoke:
 
 ```
 rank the best restaurants in manila
@@ -135,7 +135,7 @@ Writes `manila-board.md`. The board contains:
 ## File-existence asserts
 
 After the full run, confirm all artifacts exist and the board has the expected shape.
-Copy-paste this bash one-liner from the plugin root:
+Copy-paste this bash one-liner from this skill's own directory:
 
 ```bash
 for f in manila-corpus.json manila-reviews.json manila-venues.json manila-booking.json manila-results.json manila-board.md; do
