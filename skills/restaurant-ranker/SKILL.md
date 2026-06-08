@@ -1,9 +1,9 @@
 ---
 name: restaurant-ranker
 description: >
-  Rank a city's restaurants from one prompt — "rank the best restaurants in <city>",
-  "which restaurants in <city> are worth it", "best places to eat in <city>", "top
-  restaurants in <city>". Fuses editorial prestige + Google reviews + LIVE booking-demand
+  Rank a city's restaurants from one prompt — "rank the best restaurants in {city}",
+  "which restaurants in {city} are worth it", "best places to eat in {city}", "top
+  restaurants in {city}". Fuses editorial prestige + Google reviews + LIVE booking-demand
   into a Bayesian ranking with honest uncertainty intervals. Read-only — reads reservation
   calendars to measure demand, never books anything. Orchestrates the full pipeline:
   corpus → reviews → booking → model → render.
