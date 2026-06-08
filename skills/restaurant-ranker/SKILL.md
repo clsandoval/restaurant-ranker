@@ -169,14 +169,50 @@ are simply omitted — `booking.py` flags them `gated`/`off_platform=True` with 
 
 ---
 
-### Step C' — Booking
+### Step C' — Booking (two tiers: HTTP fast-probe → CloakBrowser escalation)
+
+Live booking-demand is a **co-equal pillar of the ranking**, not a nice-to-have. Half of a
+city's top venues sit behind anti-bot booking engines (TableCheck, OpenTable, DinnerBooking,
+Superb, ...). Reading them is what makes β_b identifiable. The booking step is therefore **two
+tiers**, and you run BOTH — stopping at tier 1 leaves most demand signal on the floor.
+
+**Tier C'-1 — HTTP fast-probe (cheap, no browser):**
 
 ```bash
 python3 scripts/booking.py --city <city> --venues <slug>-venues.json
 ```
 
-Writes `<slug>-booking.json`. HTTP-only, read-only. Prints `=== FILL EVIDENCE ===` table
-and `Off-platform / no-signal venues: K/total`. THE READ-ONLY LAW applies here.
+Writes `<slug>-booking.json`. Reads the JSON-endpoint engines (SevenRooms, Eatigo, CoverManager)
+over plain HTTP. Prints `=== FILL EVIDENCE ===` and `Off-platform / no-signal venues: K/total`.
+Anti-bot engines come back `channel="blocked-here"`, `fill=None` — an **honest gap, not a
+verdict.** Do NOT stop here.
+
+**Tier C'-2 — CloakBrowser escalation of every `blocked-here` venue (the showcase):**
+
+For each `blocked-here` venue, drive its real booking widget with the `booking-probe` sibling
+skill — CloakBrowser (`patchright + xvfb + humanize`) clears Turnstile / DataDome / ALTCHA / CDP
+walls and reads the live slot grid. Verified recipes per engine live in
+`../booking-probe/recipes/<engine>.md`; the tiered CloakBrowser playbook (which tier each wall
+needs, and the rule that a **403 from vanilla CloakBrowser means wrong tier, not "blocked"**) is
+the `../cloakbrowser/SKILL.md` skill. **THE READ-ONLY LAW governs every click** — reach and read
+the slot list, then STOP. Do not rationalize a coverage gap as "architectural" before confirming
+you ran the correct escalation tier (headed-under-xvfb + patchright for CDP/Cloudflare walls).
+
+booking-probe writes one resolved venue JSON per restaurant under
+`./<city>-booking-probe/clickthrough/<slug>.json`. A venue it cannot read stays honestly
+`unresolved` (e.g. PerimeterX / residential-IP walls) — never faked.
+
+**Merge the live reads back into the booking channel:**
+
+```bash
+python3 scripts/merge_fill.py --city <city> --booking <slug>-booking.json
+```
+
+Folds every genuinely-resolved clickthrough read into `<slug>-booking.json` as
+`channel="readable"` (`source="cloakbrowser"`), with fill computed by the **same**
+`fill_from_units` the HTTP path uses. Prints an upgraded/inserted/skipped summary. Honesty rail
+intact: only resolved grids upgrade; `unresolved` reads stay `fill=None`. THE READ-ONLY LAW
+applies to the whole step.
 
 ---
 
@@ -197,8 +233,9 @@ Fitting the Bayesian model now (this takes a few minutes)."
 
 Writes `<slug>-results.json` and `<slug>-posterior.nc`. Prints `venues: N (R/T readable)` and
 `divergences: D`. Aim for ≥10 readable venues so the booking-demand coefficient (β_b) is cleanly
-identified. Fewer than 10 readable is still valid — the board reports this honestly
-(`render.py _COVERAGE_FLOOR`).
+identified. **The CloakBrowser escalation (C'-2) is normally what carries you over this floor** —
+HTTP-only rarely clears 10 readable in a top-venue city. Fewer than 10 readable is still valid —
+the board reports this honestly (`render.py _COVERAGE_FLOOR`).
 
 ---
 
@@ -230,7 +267,8 @@ or report before proceeding:
 | 1 | After city config loaded | If `UnknownCityError`: relay the actionable error (name the exact `cities/<slug>.json` path and `cities/_SCHEMA.md` reference) and **STOP**. Do not proceed to corpus. |
 | 2 | After corpus assembled | Report "N venues gathered from S sources." Proceed to reviews. |
 | 3 | After engine map built | Report engines resolved per venue. Proceed to booking. |
-| 4 | Before model fit | Confirm "corpus + reviews + booking ready, X readable; fitting now." Proceed to model. |
+| 3' | After C'-1 HTTP probe | Report "K blocked-here venues to escalate via CloakBrowser." Run C'-2 + merge_fill, then report readable count after merge. |
+| 4 | Before model fit | Confirm "corpus + reviews + booking ready, X readable (after CloakBrowser merge); fitting now." Proceed to model. |
 | 5 | After render | Present board path + coverage report. Done. |
 
 Narrate progress between checkpoints. Do NOT add a y/n gate before every micro-action. Do NOT

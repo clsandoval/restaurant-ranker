@@ -102,8 +102,10 @@ is in `references/ma-dispatch.md`. **Read it before any fan-out.**
 Build order follows venue count + Michelin coverage: TableCheck → Chope → Hungry Hub → the rest →
 new engines. To add a platform, copy `recipes/_TEMPLATE.md`. Prior DOM/endpoint knowledge per
 platform (tokens, gates, widget generations) is in `references/platform-knowledge.md`. The **anti-bot
-escalation tier** (CloakBrowser + patchright + xvfb, for the Turnstile / ALTCHA / DataDome engines —
-DinnerBooking, Superb, OpenTable) is documented in `references/platform-knowledge.md`.
+escalation tier** — the tiered CloakBrowser playbook (patchright + xvfb + humanize) for the
+Turnstile / ALTCHA / DataDome / CDP walls, plus the "403 means wrong tier, not blocked" rule and the
+loop for cracking an engine with no recipe yet — is the **`cloakbrowser` sibling skill**
+(`../cloakbrowser/SKILL.md`). Read it before probing any anti-bot engine.
 
 ## Finding which engine a restaurant uses
 

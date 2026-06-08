@@ -4,11 +4,20 @@ Ports spike-026 probe100.py HTTP readers (SevenRooms, Eatigo, CoverManager) and 
 fill-computation + channel-classification logic from spike-013 assemble.py and
 spike-016 gate_ladder.py into the pipeline's booking channel.
 
-HARD CONSTRAINTS (by design):
-  - HTTP-only: no browser automation (spike 023 shows browser is TLS-blocked
-    on Managed Agents; booking platforms' own JSON endpoints work over plain
-    HTTP through the MA proxy — spike 026 validates: β_b=+2.67, 10 readable
-    venues live).
+SCOPE — this module is TIER 1 only (the cheap HTTP fast-probe), NOT the whole
+booking channel. It reads JSON-endpoint engines (SevenRooms, Eatigo,
+CoverManager). Anti-bot engines (TableCheck, OpenTable, DinnerBooking, Superb,
+...) come back channel="blocked-here", fill=None — an HONEST GAP, NOT a verdict.
+They are read at TIER 2 by the `booking-probe` sibling skill driving the real
+widget with CloakBrowser (patchright+xvfb+humanize, which clears Turnstile /
+DataDome / ALTCHA / CDP walls), and folded back into <slug>-booking.json by
+`merge_fill.py`. Do NOT treat a blocked-here record as final: escalate it.
+
+HARD CONSTRAINTS (of this tier-1 module):
+  - HTTP-only HERE: no browser automation IN THIS FILE — escalation lives in the
+    browse layer (booking-probe + merge_fill), by design, so this module stays a
+    pure stdlib probe. (spike 023 found a plain headless browser TLS-blocked on
+    MA; the CloakBrowser recipe later cleared that wall — see booking-probe.)
   - READ-ONLY: probers read availability only. Never POST to create, confirm,
     or complete a reservation. Reading the slot list IS the probe. (BOOK-04)
   - Python 3.10 stdlib only: urllib, json, re, datetime, argparse, os, sys.

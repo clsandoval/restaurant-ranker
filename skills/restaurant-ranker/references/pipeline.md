@@ -14,11 +14,28 @@ directory** (the directory containing `scripts/` and `cities/`). All outputs lan
 | A. corpus | *(agent web_search gathering — see Seam 1)* | `cities/<slug>.json` + agent `web_search` | `<slug>-corpus.json` | none |
 | B. reviews | `python3 scripts/reviews.py --city <city> --corpus <slug>-corpus.json` | `<slug>-corpus.json` | `<slug>-reviews.json` | `GOOGLE_MAPS_API_KEY` (optional; absent → channel skipped) |
 | C. engine map | *(agent discovery — see Seam 2)* | `<slug>-corpus.json` + agent engine discovery | `<slug>-venues.json` | none |
-| C'. booking | `python3 scripts/booking.py --city <city> --venues <slug>-venues.json` | `<slug>-venues.json` + live HTTP | `<slug>-booking.json` | none (HTTP-only) |
+| C'-1. booking (HTTP) | `python3 scripts/booking.py --city <city> --venues <slug>-venues.json` | `<slug>-venues.json` + live HTTP | `<slug>-booking.json` | none (HTTP-only) |
+| C'-2. booking (CloakBrowser) | *(agent drives `booking-probe` sibling skill per `blocked-here` venue)* | `<slug>-venues.json` + live widgets | `./<city>-booking-probe/clickthrough/<slug>.json` | CloakBrowser (`patchright`+`xvfb`); residential IP for some engines |
+| C'-merge | `python3 scripts/merge_fill.py --city <city> --booking <slug>-booking.json` | `<slug>-booking.json` + `clickthrough/*.json` | `<slug>-booking.json` (merged in place) | none (read-only merge) |
 | D. model | `/tmp/ranker-venv/bin/python scripts/model.py --city <city> --corpus <slug>-corpus.json --reviews <slug>-reviews.json --booking <slug>-booking.json` | all three JSONs | `<slug>-results.json`, `<slug>-posterior.nc` | uv 3.12 venv (pymc/arviz/numpy/h5netcdf) |
 | E. render | `python3 scripts/render.py --city <city> --results <slug>-results.json` | `<slug>-results.json` | `<slug>-board.md`, `<slug>-results.json` | none |
 
-**Steps B, C', and E use system `python3`.** Step D REQUIRES the uv 3.12 venv (see Venv Setup below).
+**Steps B, C'-1, C'-merge, and E use system `python3`.** Step C'-2 drives CloakBrowser via the
+`booking-probe` sibling skill. Step D REQUIRES the uv 3.12 venv (see Venv Setup below).
+
+### The two-tier booking channel (why C'-2 exists)
+
+`booking.py` (C'-1) reads only JSON-endpoint engines (SevenRooms, Eatigo, CoverManager). Every
+anti-bot engine (TableCheck, OpenTable, DinnerBooking-Turnstile, Superb-ALTCHA, ...) returns
+`channel="blocked-here"`, `fill=None` — an honest gap. C'-2 closes it: the `booking-probe` skill
+drives the real widget with CloakBrowser (`patchright`+`xvfb`+`humanize`) and writes one resolved
+clickthrough JSON per venue. `merge_fill.py` then folds those live reads into `<slug>-booking.json`
+as `channel="readable"` (`source="cloakbrowser"`), computing fill with the **same**
+`booking.fill_from_units` used for HTTP reads. A CloakBrowser read is a first-class fill
+observation. Honesty rail (BOOK-03) is preserved end-to-end: only genuinely-resolved grids
+upgrade; `unresolved`/`date=="*"` reads leave the venue blocked-here with `fill=None` — never
+fabricated. This escalation is normally what lifts a city over the ~10-readable β_b
+identifiability floor.
 
 ---
 

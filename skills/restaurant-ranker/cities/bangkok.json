@@ -1,0 +1,70 @@
+{
+  "city": "Bangkok",
+  "slug": "bangkok",
+  "country": "Thailand",
+  "prestige_sources": [
+    {"name": "Asia's 50 Best Restaurants"},
+    {"name": "Michelin Guide Thailand"},
+    {"name": "Tatler Asia Best Restaurants Bangkok"},
+    {"name": "BK Magazine Top Tables"},
+    {"name": "Time Out Bangkok Best Restaurants"},
+    {"name": "Michelin Bib Gourmand Bangkok"}
+  ],
+  "cuisine_taxonomy": [
+    {
+      "bucket": "Thai",
+      "tokens": ["thai", "isan", "isaan", "southern thai", "royal thai"]
+    },
+    {
+      "bucket": "Japanese",
+      "tokens": ["japanese", "sushi", "omakase", "kaiseki", "kappo", "yakitori"]
+    },
+    {
+      "bucket": "Italian",
+      "tokens": ["italian", "trattoria", "pizzeria"]
+    },
+    {
+      "bucket": "French",
+      "tokens": ["french", "bistro", "brasserie"]
+    },
+    {
+      "bucket": "Spanish",
+      "tokens": ["spanish", "basque", "mediterranean", "tapas"]
+    },
+    {
+      "bucket": "Steakhouse",
+      "tokens": ["steak", "grill", "chophouse"]
+    },
+    {
+      "bucket": "Chinese",
+      "tokens": ["chinese", "cantonese", "dimsum", "szechuan", "teochew"]
+    },
+    {
+      "bucket": "Indian",
+      "tokens": ["indian", "north indian", "south indian"]
+    },
+    {
+      "_note": "fallthrough bucket — any cuisine_raw not matched above lands here",
+      "bucket": "Modern/Contemporary",
+      "tokens": []
+    }
+  ],
+  "booking_platforms": {
+    "online_engines": [
+      "sevenrooms",
+      "eatigo",
+      "chope",
+      "hungryhub",
+      "tablecheck",
+      "opentable",
+      "tock",
+      "weeloy",
+      "inline",
+      "covermanager"
+    ],
+    "readable_engines": [
+      "sevenrooms",
+      "eatigo"
+    ]
+  }
+}
