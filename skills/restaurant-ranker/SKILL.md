@@ -71,8 +71,10 @@ other steps use system `python3`. See `references/pipeline.md` §VENV SETUP for 
 
 **API key (optional — reviews channel degrades gracefully if absent):**
 
+Load from the uploaded `.env` file if present, then fall back to whatever is already in env:
+
 ```bash
-export GOOGLE_MAPS_API_KEY=<your-key>
+[ -f /mnt/session/uploads/.env ] && set -a && source /mnt/session/uploads/.env && set +a
 ```
 
 If the key is absent, the reviews channel is skipped and flagged in the coverage report. The
