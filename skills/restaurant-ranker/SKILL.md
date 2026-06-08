@@ -144,9 +144,32 @@ flagged (`status: "skipped"`, reason: key not set). No action needed — proceed
 
 The agent authors `<slug>-venues.json`. No script produces this file.
 
-For each venue in `<slug>-corpus.json`, discover its booking engine and engine-specific
-identifier. Delegate hard/anti-bot engines (TableCheck, Chope, OpenTable, etc.) to the
-`booking-probe` sibling skill's `references/engine-routing.md`.
+For **every** venue in `<slug>-corpus.json`, you must actively **TRY to find a booking engine** —
+do not assume it has none.
+
+> 🚫 **"Off-platform" is a verdict you EARN by exhausting every avenue — never a default.**
+> A notable urban restaurant almost always books through *some* engine. Before a venue may be
+> omitted/off-platform, you must have actually searched for it on each engine and come up empty.
+> Skipping discovery and calling a venue "phone/email-only" because you didn't look is the
+> single biggest cause of a falsely empty booking channel. (Proof: a Manila run that did the
+> discovery found **10 readable venues on SevenRooms/Eatigo over plain HTTP** — venues a lazy
+> pass would have written off as off-platform.)
+
+**Per-venue discovery loop — exhaust ALL of these before giving up on a venue:**
+1. **Search the venue + each engine by name.** For each venue run searches like
+   `"<venue>" sevenrooms`, `"<venue>" eatigo`, `"<venue>" covermanager`, `"<venue>" reservation`,
+   then the anti-bot engines (`tablecheck`, `chope`, `opentable`, `tock`, `resy`, `zenchef`,
+   `autoreserve`, …). Many venues book through an engine even when their own site hides it.
+2. **Resolve the venue's own website → its embedded engine.** Open the reservation/"Book" button
+   on the official site and read the final host (SevenRooms widget, Eatigo iframe, etc.) — method
+   in `../booking-probe/references/engine-routing.md`.
+3. **Capture the engine-specific identifier** (SevenRooms slug, Eatigo branch id, CoverManager
+   slug) so `booking.py` can probe it.
+4. Only after **all** of the above turn up nothing for a venue may it be omitted as off-platform.
+
+Hard/anti-bot engines (TableCheck, Chope, OpenTable, Tock, Resy, Zenchef, …) are NOT a dead end —
+they go to Tier C'-2 escalation (below), via the `booking-probe` sibling skill. Map them in the
+venues file; do not drop them.
 
 **File shape:**
 ```json
@@ -163,11 +186,16 @@ the model, producing wide uncertainty that the data does not support. Always cop
 value verbatim from the corpus JSON.
 
 Valid engines: `sevenrooms`, `eatigo`, `covermanager` (booking.py PROBERS), or any engine
-listed in `cities/<slug>.json` under `booking_platforms`. Venues with no online booking engine
-are simply omitted — `booking.py` flags them `gated`/`off_platform=True` with `fill=None`
-(honesty rail BOOK-03). Never fabricate a fill value.
+listed in `cities/<slug>.json` under `booking_platforms`. A venue is omitted/off-platform ONLY
+after the per-venue discovery loop above genuinely exhausted every engine — then `booking.py`
+flags it `gated`/`off_platform=True` with `fill=None` (honesty rail BOOK-03). The honesty rail
+cuts both ways: never fabricate a fill, AND never fabricate an *absence* of one by failing to
+look. If you mark a venue off-platform, you must be able to name which engines you searched.
 
-**Checkpoint 3:** Report engines resolved per venue before running booking.
+**Checkpoint 3:** Report the engine resolved for EVERY venue. For any venue you're calling
+off-platform, state which engines you searched (so "off-platform" is auditable, not assumed).
+If the readable-engine count looks low for a major city, you almost certainly under-searched —
+go back and finish the discovery loop before running booking.
 
 ---
 
@@ -290,7 +318,7 @@ or report before proceeding:
 |---|------|--------|
 | 1 | After city config loaded | If `UnknownCityError`: relay the actionable error (name the exact `cities/<slug>.json` path and `cities/_SCHEMA.md` reference) and **STOP**. Do not proceed to corpus. |
 | 2 | After corpus assembled | Report "N venues gathered from S sources." Proceed to reviews. |
-| 3 | After engine map built | Report engines resolved per venue. Proceed to booking. |
+| 3 | After engine map built | Report the engine resolved for every venue; for any off-platform venue, name the engines searched. Low readable count for a major city = under-searched → finish the discovery loop. Proceed to booking. |
 | 3' | After C'-1 HTTP probe | Report "K blocked-here venues to escalate via CloakBrowser." Run C'-2 + merge_fill, then report readable count after merge. |
 | 4 | Before model fit | Confirm "corpus + reviews + booking ready, X readable (after CloakBrowser merge); fitting now." Proceed to model. |
 | 5 | After render | Present board path + coverage report. Done. |
